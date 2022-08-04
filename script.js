@@ -22,17 +22,17 @@ $(function () {
             var songs = []
 
             songsArray.forEach(song => {
-                var title = $(song).find('a').text()
+                var title = $(song).find('a').text().replace('(tradução)', '').trim()
                 var href = $(song).find('a').attr('href');
-                var artist = $(song).find('.styleBlack').text()
+                var artist = $(song).find('.styleBlack').text().trim()
                 songs.push({ title: title, artist: artist, href: href })
 
                 if (!songsname.includes(title)) {
-                    songsname.push(title.trim().replace('(tradução)',''));
+                    songsname.push(title);
                 }
 
                 if (!artists.includes(artist)) {
-                    artists.push(artist.trim());
+                    artists.push(artist);
                 }
             })
 
@@ -100,20 +100,39 @@ $(function () {
 
     $('#guessButton').on('click', function () {
         var guess = $('#guess').val().toUpperCase();
-        if (guess == song.title.toUpperCase() || guess == song.artist.toUpperCase()) {
-            alert('ACERTOU');
-        } else {
-            line++;
-            tries++;
-            if (line >= lyrics.length) {
-                line = 0;
+        if (guess != '') {
+            if (guess == song.title.toUpperCase() || guess == song.artist.toUpperCase()) {
+                alert('ACERTOU');
+            } else {
+                line++;
+                tries++;
+                if (line >= lyrics.length) {
+                    line = 0;
+                }
+                $('#lyrics').append(`<p class="text-default">${lyrics[line]}</p>`)
+                var objDiv = document.getElementById("lyrics");
+                objDiv.scrollTop = objDiv.scrollHeight;
+                $('#lines_tries').text(tries);
+                $('#tries').append(`<p>${guess}</p>`)
+                var objDiv = document.getElementById("tries");
+                objDiv.scrollTop = objDiv.scrollHeight;
             }
-            $('#lyrics').append(`<p class="text-default">${lyrics[line]}</p>`)
-            var objDiv = document.getElementById("lyrics");
-            objDiv.scrollTop = objDiv.scrollHeight;
-            $('#lines_tries').text(tries);
         }
     })
+
+    $('#revealButton').on('click', function () {
+
+        Swal.fire({
+            title: `Música: ${song.title}`,
+            text: `Artista: ${song.artist}`,
+            icon: 'info',
+            confirmButtonText: 'Novo Jogo'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.reload();
+            }
+        });
+    });
 
     function autocomplete(inp, arr) {
         /*the autocomplete function takes two arguments,
