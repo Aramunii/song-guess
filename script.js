@@ -5,11 +5,12 @@ $(function () {
     var song;
     var songsname = [];
     var artists = [];
+    var tries = 0;
 
     async function main() {
         // var response = await axios.get('https://www.vagalume.com.br/top100/musicas/original/2022/07/');
 
-       var response = await fetch('https://www.vagalume.com.br/top100/musicas/original/2022/07/').then(function (response) {
+        var response = await fetch('https://www.vagalume.com.br/top100/musicas/original/2022/07/').then(function (response) {
             // The API call was successful!
             return response.text();
         }).then(async function (html) {
@@ -17,39 +18,39 @@ $(function () {
             console.log(html);
             const songsArray = $(html).find('.topSongs').toArray();
 
-        var songs = []
+            var songs = []
 
-        songsArray.forEach(song => {
-            var title = $(song).find('a').text()
-            var href = $(song).find('a').attr('href');
-            var artist = $(song).find('.styleBlack').text()
-            songs.push({ title: title, artist: artist, href: href })
+            songsArray.forEach(song => {
+                var title = $(song).find('a').text()
+                var href = $(song).find('a').attr('href');
+                var artist = $(song).find('.styleBlack').text()
+                songs.push({ title: title, artist: artist, href: href })
 
-            if (!songsname.includes(title)) {
-                songsname.push(title.trim());
-            }
+                if (!songsname.includes(title)) {
+                    songsname.push(title.trim());
+                }
 
-            if (!artists.includes(artist)) {
-                artists.push(artist.trim());
-            }
-        })
+                if (!artists.includes(artist)) {
+                    artists.push(artist.trim());
+                }
+            })
 
-        autocompl = songsname.concat(artists);
+            autocompl = songsname.concat(artists);
 
-        autocompl.forEach(option => {
-            $('#guessList').append(` <option value="${option}">
+            autocompl.forEach(option => {
+                $('#guessList').append(` <option value="${option}">
         </option>`)
-        })
+            })
 
-        // autocomplete(document.getElementById("guess"), autocompl);
+            // autocomplete(document.getElementById("guess"), autocompl);
 
-        const random = Math.floor(Math.random() * songs.length);
-        song = songs[random];
+            const random = Math.floor(Math.random() * songs.length);
+            song = songs[random];
 
-        console.log(song);
-        var href = song.href.replace('-traducao', '');
-        href = href.replace('traducao', '');
-        await getLyric(href);
+            console.log(song);
+            var href = song.href.replace('-traducao', '');
+            href = href.replace('traducao', '');
+            await getLyric(href);
         }).catch(function (err) {
             // There was an error
             console.warn('Something went wrong.', err);
@@ -57,7 +58,7 @@ $(function () {
 
         console.log(response);
 
-        
+
     }
     main();
 
@@ -71,24 +72,24 @@ $(function () {
             var lyric = $(html).find('#lyrics').html();
             var lyric = lyric.replace('<br><br>', '<br>');
             lyrics = lyric.split('<br>');
-    
+
             lyrics = lyrics.filter(line => {
                 if (line != '') {
                     return line;
                 }
             });
-    
+
             line = Math.floor(Math.random() * lyrics.length);
             // console.log(lyric);
-    
-    
-            $('#lyrics').append(`<p>${lyrics[line]}</p>`)
+
+
+            $('#lyrics').append(`<p class="text-default">${lyrics[line]}</p>`)
             console.log(lyrics[line]);
         }).catch(function (err) {
             // There was an error
             console.warn('Something went wrong.', err);
         });
-       
+
     }
 
     $('#newLine').on('click', function () {
@@ -99,15 +100,17 @@ $(function () {
 
     $('#guessButton').on('click', function () {
         var guess = $('#guess').val().toUpperCase();
-
-        if (guess == song.title.toUpperCase()) {
+        if (guess == song.title.toUpperCase() || guess == song.artist.toUpperCase()) {
             alert('ACERTOU');
-        } else if (guess == song.artist.toUpperCase()) {
-            alert('Acertou');
         } else {
-            alert("ERROU");
+            line++;
+            if (line >= lyrics.length) {
+                line = 0;
+            }
+            $('#lyrics').append(`<p class="text-default">${lyrics[line]}</p>`)
+            var objDiv = document.getElementById("lyrics");
+            objDiv.scrollTop = objDiv.scrollHeight;
         }
-        console.log(guess);
     })
 
     function autocomplete(inp, arr) {
@@ -206,5 +209,5 @@ $(function () {
             closeAllLists(e.target);
         });
     }
- 
+
 })
