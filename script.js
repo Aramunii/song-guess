@@ -7,9 +7,15 @@ $(function () {
     var artists = [];
 
     async function main() {
-        var response = await axios.get('https://www.vagalume.com.br/top100/musicas/original/2022/07/');
+        // var response = await axios.get('https://www.vagalume.com.br/top100/musicas/original/2022/07/');
 
-        const songsArray = $(response.data).find('.topSongs').toArray();
+       var response = await fetch('https://www.vagalume.com.br/top100/musicas/original/2022/07/').then(function (response) {
+            // The API call was successful!
+            return response.text();
+        }).then(async function (html) {
+            // This is the HTML from our response as a text string
+            console.log(html);
+            const songsArray = $(html).find('.topSongs').toArray();
 
         var songs = []
 
@@ -44,28 +50,45 @@ $(function () {
         var href = song.href.replace('-traducao', '');
         href = href.replace('traducao', '');
         await getLyric(href);
+        }).catch(function (err) {
+            // There was an error
+            console.warn('Something went wrong.', err);
+        });
+
+        console.log(response);
+
+        
     }
     main();
 
     async function getLyric(href) {
-        var response = await axios.get('https://www.vagalume.com.br' + href);
-
-        var lyric = $(response.data).find('#lyrics').html();
-        var lyric = lyric.replace('<br><br>', '<br>');
-        lyrics = lyric.split('<br>');
-
-        lyrics = lyrics.filter(line => {
-            if (line != '') {
-                return line;
-            }
+        var response = await fetch('https://www.vagalume.com.br' + href).then(function (response) {
+            // The API call was successful!
+            return response.text();
+        }).then(function (html) {
+            // This is the HTML from our response as a text string
+            console.log(html);
+            var lyric = $(html).find('#lyrics').html();
+            var lyric = lyric.replace('<br><br>', '<br>');
+            lyrics = lyric.split('<br>');
+    
+            lyrics = lyrics.filter(line => {
+                if (line != '') {
+                    return line;
+                }
+            });
+    
+            line = Math.floor(Math.random() * lyrics.length);
+            // console.log(lyric);
+    
+    
+            $('#lyrics').append(`<p>${lyrics[line]}</p>`)
+            console.log(lyrics[line]);
+        }).catch(function (err) {
+            // There was an error
+            console.warn('Something went wrong.', err);
         });
-
-        line = Math.floor(Math.random() * lyrics.length);
-        // console.log(lyric);
-
-
-        $('#lyrics').append(`<p>${lyrics[line]}</p>`)
-        console.log(lyrics[line]);
+       
     }
 
     $('#newLine').on('click', function () {
@@ -183,5 +206,5 @@ $(function () {
             closeAllLists(e.target);
         });
     }
-
+ 
 })
