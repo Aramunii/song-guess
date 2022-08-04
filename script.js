@@ -5,7 +5,8 @@ $(function () {
     var song;
     var songsname = [];
     var artists = [];
-    var tries = 0;
+    var tries = 1;
+    var tries_guess = [];
 
     async function main() {
         // var response = await axios.get('https://www.vagalume.com.br/top100/musicas/original/2022/07/');
@@ -27,7 +28,7 @@ $(function () {
                 songs.push({ title: title, artist: artist, href: href })
 
                 if (!songsname.includes(title)) {
-                    songsname.push(title.trim());
+                    songsname.push(title.trim().replace('(tradução)',''));
                 }
 
                 if (!artists.includes(artist)) {
@@ -47,7 +48,6 @@ $(function () {
             const random = Math.floor(Math.random() * songs.length);
             song = songs[random];
 
-            console.log(song);
             var href = song.href.replace('-traducao', '');
             href = href.replace('traducao', '');
             await getLyric(href);
@@ -104,12 +104,14 @@ $(function () {
             alert('ACERTOU');
         } else {
             line++;
+            tries++;
             if (line >= lyrics.length) {
                 line = 0;
             }
             $('#lyrics').append(`<p class="text-default">${lyrics[line]}</p>`)
             var objDiv = document.getElementById("lyrics");
             objDiv.scrollTop = objDiv.scrollHeight;
+            $('#lines_tries').text(tries);
         }
     })
 
