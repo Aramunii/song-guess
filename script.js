@@ -172,6 +172,8 @@ $(function () {
     }
 
     function newSong() {
+        tries = 1;
+        $('#lines_tries').text(tries);
         $('#lyrics').empty();
         $('#tries').empty();
         $('#guess').val('');
