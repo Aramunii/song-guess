@@ -1,52 +1,67 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
 
 async function main() {
 
-    var response = await axios.get('https://www.vagalume.com.br/top100/musicas/original/2022/07/');
-    const $ = cheerio.load(response.data);
+    var artists_all = [];
 
-    const songsArray = $('.topSongs').toArray();
+    var pages = [
+        "/browse/0-9.html",
+        "/browse/a.html",
+        "/browse/b.html",
+        "/browse/c.html",
+        "/browse/d.html",
+        "/browse/e.html",
+        "/browse/f.html",
+        "/browse/g.html",
+        "/browse/h.html",
+        "/browse/i.html",
+        "/browse/j.html",
+        "/browse/k.html",
+        "/browse/l.html",
+        "/browse/m.html",
+        "/browse/n.html",
+        "/browse/o.html",
+        "/browse/p.html",
+        "/browse/q.html",
+        "/browse/r.html",
+        "/browse/s.html",
+        "/browse/t.html",
+        "/browse/u.html",
+        "/browse/v.html",
+        "/browse/w.html",
+        "/browse/x.html",
+        "/browse/y.html",
+        "/browse/z.html"
+    ];
 
-    var songs = []
+    // var pages = [
+    //     "/browse/a.html",
+    // ];
 
-    songsArray.forEach(song => {
-        var title = $(song).find('a').text()
-        var href = $(song).find('a').attr('href');
-        var artist = $(song).find('.styleBlack').text()
-        songs.push({ title: title, artist: artist,href: href })
-    })
+    pages.forEach(async letter => {
+        var response = await axios.get('https://www.vagalume.com.br' + letter);
+        const $ = cheerio.load(response.data);
+        var artists = $('.moreNamesContainer').find('li').toArray();
 
-    const random = Math.floor(Math.random() * songs.length);
-    console.log(songs[random]);
-    var song = songs[random];
-    
-    var href = song.href.replace('-traducao','');
-    href = href.replace('traducao','');
-    var teste = await getLyric(href);
+        artists.forEach(artist => {
+            artists_all.push({
+                'name': $(artist).find('a').text(),
+                'link':  $(artist).find('a').attr('href')
+            });
+
+        });
+
+        fs.writeFileSync('./data.json', JSON.stringify(artists_all));
+
+    });
+
 
 }
 
-async function getLyric(href)
-{
-    var response  = await axios.get('https://www.vagalume.com.br' + href);
-    const $ = cheerio.load(response.data);
-    console.log(response);
+async function getLyric(href) {
 
-    var lyric = $('#lyrics').html();
-    var lyric = lyric.replace('<br><br>','<br>');
-    var lyrics = lyric.split('<br>');
-
-    lyrics = lyrics.filter(line=>{
-        if(line != '')
-        {
-            return line;
-        }
-    });
-
-    const random = Math.floor(Math.random() * lyrics.length);
-    // console.log(lyric);
-    console.log(lyrics[random]);
 }
 
 

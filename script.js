@@ -8,6 +8,21 @@ $(function () {
     var tries = 1;
     var tries_guess = [];
 
+    async function teste()
+    {
+        var response = await fetch('./data.json').then(function (response) {
+            // The API call was successful!
+            return response.text();
+        }).then(async function(html)
+        {
+            console.log(html);
+        });
+    }
+
+    teste();
+
+
+
     async function main() {
         // var response = await axios.get('https://www.vagalume.com.br/top100/musicas/original/2022/07/');
 
@@ -60,7 +75,8 @@ $(function () {
 
 
     }
-    main();
+
+    // main();
 
     async function getLyric(href) {
         var response = await fetch('https://www.vagalume.com.br' + href).then(function (response) {
@@ -102,7 +118,18 @@ $(function () {
         var guess = $('#guess').val().toUpperCase();
         if (guess != '') {
             if (guess == song.title.toUpperCase() || guess == song.artist.toUpperCase()) {
-                alert('ACERTOU');
+                Swal.fire({
+                    title: `Você acertou!`,
+                    html:
+                        `Música: <b>${song.title}</b><br>Artista: ${song.artist} `,
+                    icon: 'success',
+                    confirmButtonText: 'Novo Jogo'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.reload();
+                    }
+                });
+
             } else {
                 line++;
                 tries++;
