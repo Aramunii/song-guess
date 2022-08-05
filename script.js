@@ -182,18 +182,7 @@ $(function () {
             console.log(difficult - 1);
             getLyric(gameMusics[difficult - 1])
         } else {
-            Swal.fire({
-                title: `Fim de Jogo`,
-                icon: 'info',
-                confirmButtonText: 'Novo Jogo'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log(gameMusics);
-                    console.log(selectedArtistName);
-                    // window.location.reload();
-                    endGame();
-                }
-            });
+            endGame();
         }
     }
 
