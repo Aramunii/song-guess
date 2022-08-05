@@ -19,7 +19,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="./node_modules/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js" integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"
+        integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
     <script src="./script.js"></script>
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
@@ -28,11 +32,11 @@
             color: black;
         }
 
-        .mt-10{
+        .mt-10 {
             margin-top: 10px;
         }
 
-        .mb-10{
+        .mb-10 {
             margin-bottom: 10px;
         }
     </style>
@@ -58,24 +62,27 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="p-4">
-                                        <h3 class="mb-10 font-weight-bold text-primary text-center">Linhas: <span id="lines_tries">1</span></h6>
-    
-                                        <div class=""></div>
-                                        <div id="lyrics" class="bg-gray-300"
-                                            style="padding: 19px;overflow: scroll;max-width: 50p;max-height: 230px;">
-                                        </div>
-                                        <div class="form-group" style="margin-top: 20px;">
-                                            <input class="form-control form-control-user" value="" list="guessList"
-                                                id="guess" type="text" name="guess"
-                                                placeholder="Digite uma música ou Artista" autocomplete="on">
-                                            <datalist id="guessList"></datalist>
-    
-                                        </div>
-                                        <button id="guessButton" class="btn btn-primary btn-user btn-block">Adivinhar</button>
-                                        <button id="revealButton" class="btn btn-gradient-warning text-white bg-gradient-warning btn-user btn-block">Revelar</button>
-    
-    
-                                        <!-- <div style="margin-top: 20px;">
+                                        <h3 class="mb-10 font-weight-bold text-primary text-center">Linhas: <span
+                                                id="lines_tries">1</span></h6>
+
+                                            <div class=""></div>
+                                            <div id="lyrics" class="bg-gray-300"
+                                                style="padding: 19px;overflow: scroll;max-width: 50p;max-height: 230px;">
+                                            </div>
+                                            <div class="form-group" style="margin-top: 20px;">
+                                                <input class="form-control form-control-user" value="" list="guessList"
+                                                    id="guess" type="text" name="guess"
+                                                    placeholder="Digite uma música ou Artista" autocomplete="on">
+                                                <datalist id="guessList"></datalist>
+
+                                            </div>
+                                            <button id="guessButton"
+                                                class="btn btn-primary btn-user btn-block">Adivinhar</button>
+                                            <button id="revealButton"
+                                                class="btn btn-gradient-warning text-white bg-gradient-warning btn-user btn-block">Revelar</button>
+
+
+                                            <!-- <div style="margin-top: 20px;">
                                             <button id="newLine">Nova Linha</button>
                                         </div> -->
                                     </div>
@@ -94,7 +101,7 @@
                                     <div class="p-3">
                                         <div id="tries" class="bg-gray-300"
                                             style="padding: 19px;overflow: scroll;max-width: 50p;max-height: 200px;">
-                                        </div>                                
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -102,36 +109,122 @@
                     </div>
                 </div>
 
-                <div id="selectMenu">
+                <div id="selectMenu" style="display: block;">
                     <div class="card o-hidden border-0 shadow-lg my-5">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary text-center">Selecione um artista</h6>
+                            <h6 class="m-0 font-weight-bold text-primary text-center">Selecione o Artista</h6>
                         </div>
                         <div class="card-body p-0">
                             <!-- Nested Row within Card Body -->
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="p-4">
-                                        <div class="form-group" style="margin-top: 20px;">
-                                            <select  class="form-control form-control-user"
-                                                id="selectArtists"
-                                                placeholder="Digite o Artista">
-                                            <!-- <datalist id="artists"></datalist> -->
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <div class="form-group" style="margin-top: 20px;">
+                                                    <input class="form-control form-control-user" value=""
+                                                        list="artists" id="selectArtists" type="text" name="artists"
+                                                        placeholder="Digite uma música ou Artista" autocomplete="on">
+                                                    <datalist id="artists"></datalist>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group" style="margin-top: 20px;">
+                                                    <button id="selectButton"
+                                                        class="btn btn-primary btn-user">Selecionar</button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button id="selectArtist" class="btn btn-primary btn-user btn-block">Selecionar</button>
-                                        <button id="randomArtist" class="btn btn-gradient-warning text-white bg-gradient-warning btn-user btn-block">Aleatório</button>
+                                        <button id="randomButton"
+                                            class="btn btn-gradient-warning text-white bg-gradient-warning btn-user btn-block">Aleátorio</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dificultSelect" style="display: none;">
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary text-center">Deseja adivinhar quantas músicas?
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Nested Row within Card Body -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="p-4">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group" style="margin-top: 20px;">
+                                                    <button
+                                                        class="btn btn-primary btn-user btn-block start-game">3</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" style="margin-top: 20px;">
+                                                    <button id="5_musics"
+                                                        class="btn btn-primary btn-user btn-block start-game">5</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" style="margin-top: 20px;">
+                                                    <button id="10_musics"
+                                                        class="btn btn-primary btn-user btn-block start-game">10</button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
                 </div>
 
+                <div id="endGame" style="display: none;">
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary text-center">Obrigado por jogar!
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Nested Row within Card Body -->
+                            <div class="row text-default">
+                                <div class="col-lg-12">
+                                    <div class="p-4">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h1 id="artist_title" class="text-center">Supercombo</h1>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <ul id="answers" type="none" class="text-center">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h4 class="text-center">Pontuação: <span
+                                                        id="count_play"><b>2/3</b></span></h4>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 20px;">
+                                            <button id="10_musics" class="btn btn-primary btn-user btn-block share">Novo
+                                                jogo</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
+
+    </div>
 
     </div>
 

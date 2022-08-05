@@ -7,21 +7,30 @@ $(function () {
     var artists = [];
     var tries = 1;
     var tries_guess = [];
+    var all_artists = [];
+    var selectedMusics = [];
+    var gameMusics = [];
+    var difficult = 0;
+    var song_count = 0;
+    var correct_count = 0;
+    var selectedArtistName = '';
 
-    async function teste()
-    {
-        var response = await fetch('./data.json').then(function (response) {
+    var SelectMenu = $('#selectMenu');
+    var GamePlay = $('#gameContent');
+    var Difficult = $('#dificultSelect');
+    var EndGame = $('#endGame');
+
+
+    async function teste() {
+        var response = await fetch('https://aramunii.github.io/song-guess/data.json').then(function (response) {
             // The API call was successful!
             return response.text();
-        }).then(async function(html)
-        {
-            console.log(html);
+        }).then(async function (html) {
+            all_artists = JSON.parse(html);
         });
     }
 
     teste();
-
-
 
     async function main() {
         // var response = await axios.get('https://www.vagalume.com.br/top100/musicas/original/2022/07/');
@@ -79,7 +88,23 @@ $(function () {
     // main();
 
     async function getLyric(href) {
-        var response = await fetch('https://www.vagalume.com.br' + href).then(function (response) {
+        console.log(href);
+        if (typeof href == 'undefined') {
+            Swal.fire({
+                title: `Ocorreu um erro ao carregar músicas`,
+                icon: 'error',
+                confirmButtonText: 'Reiniciar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.reload()
+                }
+            });
+        }
+        var link = href.link.replace('-traduccion', '');
+        link = link.replace('traduccion', '');
+        link.replace('-traducao', '');
+        link.replace('traducao', '');
+        var response = await fetch('https://www.vagalume.com.br' + link).then(function (response) {
             // The API call was successful!
             return response.text();
         }).then(function (html) {
@@ -97,8 +122,6 @@ $(function () {
 
             line = Math.floor(Math.random() * lyrics.length);
             // console.log(lyric);
-
-
             $('#lyrics').append(`<p class="text-default">${lyrics[line]}</p>`)
             console.log(lyrics[line]);
         }).catch(function (err) {
@@ -114,52 +137,182 @@ $(function () {
         console.log(lyrics[line]);
     })
 
-    $('#guessButton').on('click', function () {
-        var guess = $('#guess').val().toUpperCase();
-        if (guess != '') {
-            if (guess == song.title.toUpperCase() || guess == song.artist.toUpperCase()) {
-                Swal.fire({
-                    title: `Você acertou!`,
-                    html:
-                        `Música: <b>${song.title}</b><br>Artista: ${song.artist} `,
-                    icon: 'success',
-                    confirmButtonText: 'Novo Jogo'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.reload();
-                    }
-                });
 
-            } else {
-                line++;
-                tries++;
-                if (line >= lyrics.length) {
-                    line = 0;
+
+    $('#revealButton').on('click', function () {
+        nextSong('info');
+    });
+
+    function nextSong(icon) {
+        var song = gameMusics[difficult - 1];
+        if (icon == 'success') {
+            Swal.fire({
+                title: `Você acertou!`,
+                icon: icon,
+                confirmButtonText: 'Proxíma música'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    correct_count++;
+                    gameMusics[difficult - 1].correct = true;
+                    newSong();
                 }
-                $('#lyrics').append(`<p class="text-default">${lyrics[line]}</p>`)
-                var objDiv = document.getElementById("lyrics");
-                objDiv.scrollTop = objDiv.scrollHeight;
-                $('#lines_tries').text(tries);
-                $('#tries').append(`<p>${guess}</p>`)
-                var objDiv = document.getElementById("tries");
-                objDiv.scrollTop = objDiv.scrollHeight;
+            });
+        } else {
+            Swal.fire({
+                title: `Música: ${song.title}`,
+                icon: icon,
+                confirmButtonText: 'Proxíma música'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    newSong();
+                }
+            });
+        }
+
+    }
+
+    function newSong() {
+        $('#lyrics').empty();
+        $('#tries').empty();
+        $('#guess').val('');
+        difficult--;
+        if (difficult >= 1) {
+            console.log(difficult - 1);
+            getLyric(gameMusics[difficult - 1])
+        } else {
+            Swal.fire({
+                title: `Fim de Jogo`,
+                icon: 'info',
+                confirmButtonText: 'Novo Jogo'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log(gameMusics);
+                    console.log(selectedArtistName);
+                    // window.location.reload();
+                    endGame();
+                }
+            });
+        }
+    }
+
+    function endGame() {
+        $('#artist_title').text(selectedArtistName);
+        $('#count_play').text(`${correct_count}/${song_count}`)
+        gameMusics.forEach(song => {
+            var emoji = song.correct ? '&#9989;' : '&#10060;'
+            $('#answers').append(`<li >${song.title} ${emoji}</li>`)
+        })
+        GamePlay.hide(300);
+        EndGame.show(300);
+
+    }
+
+    $('#selectArtists').on('input', function () {
+        // do something
+        var input = $(this).val().toUpperCase();
+        var newArtists = all_artists.filter(artist => {
+            if (artist.name.toUpperCase().includes(input)) {
+                return artist.name;
             }
+        })
+
+        if (newArtists.length < 200) {
+            $('#artists').empty();
+            newArtists.forEach(option => {
+                $('#artists').append(`<option value="${option.name}">
+        </option>`)
+            })
+        }
+    });
+
+    $('#selectButton').on('click', async function () {
+        var input = $('#selectArtists').val().toUpperCase();
+        var selectedArtist = all_artists.filter(artist => {
+            if (artist.name.toUpperCase() == input) {
+                return artist;
+            }
+        })
+        if (selectedArtist.length == 0) {
+            Swal.fire({
+                title: `Artista não encontrado!`,
+                html: ``,
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            })
+        } else {
+
+
+            selectedArtistName = selectedArtist[0].name;
+            await getMusics(selectedArtist[0]);
+            SelectMenu.hide(500);
+            Difficult.show(500);
         }
     })
 
-    $('#revealButton').on('click', function () {
-
-        Swal.fire({
-            title: `Música: ${song.title}`,
-            text: `Artista: ${song.artist}`,
-            icon: 'info',
-            confirmButtonText: 'Novo Jogo'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.reload();
-            }
+    async function getMusics(selectedArtist) {
+        var response = await fetch('https://www.vagalume.com.br' + selectedArtist.link).then(function (response) {
+            // The API call was successful!
+            return response.text();
+        }).then(async function (html) {
+            const songsArray = $(html).find('#alfabetMusicList').find('li').toArray();
+            selectedMusics = songsArray.map(song => {
+                var title = $(song).find('.nameMusic').text();
+                var link = $(song).find('.nameMusic').attr('href');
+                return { title: title, link: link }
+            })
         });
+    }
+
+    $('#randomButton').on('click', function () {
+        const random = Math.floor(Math.random() * all_artists.length);
+        $('#selectArtists').val(all_artists[random].name);
     });
+
+    $('.start-game').on('click', function () {
+        difficult = parseInt($(this).text());
+        song_count = difficult;
+        gameMusics = selectedMusics.sort(() => Math.random() - Math.random()).slice(0, difficult)
+        gameMusics = gameMusics.map(music => {
+            return { title: music.title, link: music.link, correct: false }
+        })
+
+        startGame();
+
+        selectedMusics.forEach(option => {
+            $('#guessList').append(` <option value="${option.title}">
+    </option>`)
+        })
+
+    })
+
+    async function startGame() {
+        Difficult.hide(300);
+        getLyric(gameMusics[difficult - 1])
+        GamePlay.show(300);
+    }
+
+    $('#guessButton').on('click', function () {
+        var guess = $('#guess').val().toUpperCase();
+        var song = gameMusics[difficult - 1];
+        if (guess == song.title.toUpperCase()) {
+            nextSong('success');
+        } else {
+            line++;
+            tries++;
+            if (line >= lyrics.length) {
+                line = 0;
+            }
+            $('#lyrics').append(`<p class="text-default">${lyrics[line]}</p>`)
+            var objDiv = document.getElementById("lyrics");
+            objDiv.scrollTop = objDiv.scrollHeight;
+            $('#lines_tries').text(tries);
+            $('#tries').append(`<p>${guess}</p>`)
+            var objDiv = document.getElementById("tries");
+            objDiv.scrollTop = objDiv.scrollHeight;
+        }
+    })
+
+
 
     function autocomplete(inp, arr) {
         /*the autocomplete function takes two arguments,
@@ -258,4 +411,7 @@ $(function () {
         });
     }
 
+    $(".share").on('click', function () {
+        window.location.reload();
+    });
 })
