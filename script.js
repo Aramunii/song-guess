@@ -171,6 +171,9 @@ $(function () {
                 if (result.isConfirmed) {
                     correct_count++;
                     gameMusics[difficult - 1].correct = true;
+                    if (gamemode == 'letter') {
+                        gameMusics[difficult - 1].lines = tries;
+                    }
                     if (gamemode == 'midi') {
                         gameMusics[difficult - 1].time = totalTimePlayed;
                     }
@@ -187,6 +190,9 @@ $(function () {
                 if (result.isConfirmed) {
                     if (gamemode == 'midi') {
                         gameMusics[difficult - 1].time = totalTimePlayed;
+                    }
+                    if (gamemode == 'letter') {
+                        gameMusics[difficult - 1].lines = tries;
                     }
                     newSong();
                 }
@@ -228,7 +234,7 @@ $(function () {
         if (gamemode == 'letter') {
             gameMusics.forEach(song => {
                 var emoji = song.correct ? '&#9989;' : '&#10060;'
-                $('#answers').append(`<li >${song.title} ${emoji}</li>`)
+                $('#answers').append(`<li >${song.title} - ${emoji} - Linhas: ${song.lines}</li>`)
             })
         } else if (gamemode == 'midi') {
             gameMusics.forEach(song => {
@@ -333,9 +339,22 @@ $(function () {
             }
         })
 
-        console.log(selectedArtist.length);
         setModes();
-        GameMode.show(500);
+
+        if (input != '' && selectedMidi.length > 0 || input != '' && selectedArtist.length > 0) {
+
+            GameMode.show(500);
+        } else {
+            Swal.fire({
+                title: `Ocorreu um erro ao carregar músicas deste artista`,
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                }
+            });
+        }
+
     })
 
     async function setModes() {
@@ -345,6 +364,7 @@ $(function () {
         } else {
             $('#startMidi').hide();
         }
+
         if (selectedArtist.length > 0) {
             selectedArtistName = selectedArtist[0].name;
             await getMusics(selectedArtist[0]);
@@ -352,6 +372,7 @@ $(function () {
         } else {
             $('#startLetter').hide();
         }
+
     }
 
 
@@ -385,7 +406,7 @@ $(function () {
             song_count = difficult;
             gameMusics = selectedMusics.sort(() => Math.random() - Math.random()).slice(0, difficult)
             gameMusics = gameMusics.map(music => {
-                return { title: music.title, link: music.link, correct: false }
+                return { title: music.title, link: music.link, correct: false, lines: 1 }
             })
             song_count = gameMusics.length;
             difficult = song_count;
