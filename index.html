@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
 
@@ -19,9 +19,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="./node_modules/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>
+    <link rel="stylesheet" media="all" href="https://www.mididb.com/css/style.css" type="text/css">
 
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+    <!-- <script src="https://www.mididb.com/js/functions.min.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.0/jplayer/jquery.jplayer.min.js" integrity="sha512-3LiC+u50IDBLoYYHqC/xHkffIzYT7vCSP+rH+sZhp5NfDSjHchp0uCu6Q2k4jrizRovc13O8rpujnfSz8XhilQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- <link rel="stylesheet" href="http://happyworm.com/jPlayerLab/circleplayer/v13/circle.skin/circle.player.css"> -->
+    <script type="text/javascript" src="http://happyworm.com/jPlayerLab/circleplayer/v13/js/jquery.transform.js"></script>
+    <script type="text/javascript" src="http://happyworm.com/jPlayerLab/circleplayer/v13/js/jquery.grab.js"></script>
+    <script type="text/javascript" src="http://happyworm.com/jPlayerLab/circleplayer/v13/js/jquery.jplayer.js"></script>
+    <script type="text/javascript" src="http://happyworm.com/jPlayerLab/circleplayer/v13/js/mod.csstransforms.min.js"></script>
+    <script src="./circle.player.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"
         integrity="sha256-+C0A5Ilqmu4QcSPxrlGpaZxJ04VjsRjKu+G82kl5UJk=" crossorigin="anonymous"></script>
     <script src="./script.js"></script>
@@ -71,8 +80,8 @@
                                             </div>
                                             <div class="form-group" style="margin-top: 20px;">
                                                 <input class="form-control form-control-user" value="" list="guessList"
-                                                    id="guess" type="text" name="guess"
-                                                    placeholder="Digite uma música ou Artista" autocomplete="on">
+                                                    id="guess" type="text" name="guess" placeholder="Digite uma música"
+                                                    autocomplete="on">
                                                 <datalist id="guessList"></datalist>
 
                                             </div>
@@ -182,6 +191,99 @@
                     </div>
                 </div>
 
+                <div id="gameMode" style="display: none;">
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary text-center">Selecione o Modo de Jogo
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Nested Row within Card Body -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="p-4">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group" style="margin-top: 20px;">
+                                                    <button id='startLetter'
+                                                        class="btn btn-primary btn-user btn-block ">Adivinhe pela Letra</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" style="margin-top: 20px;">
+                                                    <button id='startMidi'
+                                                        class="btn btn-primary btn-user btn-block">Adivinhe pelo Som</button>
+                                                </div>
+                                            </div>                                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="gameContentMidi" style="display: none;">
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary text-center">Descubra a música pelo toque.
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Nested Row within Card Body -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="p-4">
+                                        <h3 class="text-default text-center timeMidi">0</h1>
+                                        <div id="midi" class="bg-gray-300"
+                                            style="padding: 19px;overflow: scroll;max-width: 50p;max-height: 230px;">
+                                            <div id="playerteste">
+                                                <div id="jquery_jplayer_2" class="cp-jplayer" style="width: 0px; height: 0px;"><img id="jp_poster_1" style="width: 0px; height: 0px; display: none;"><audio id="jp_audio_1" preload="metadata" src="http://www.jplayer.org/audio/m4a/Miaow-04-Lismore.m4a"></audio></div>
+                                                <div class="center song-control">
+                                                    <div id="cp_container_2" class="">
+                                                        <ul class="cp-controls" type="none">
+                                                            <li><a href="#" class="cp-play btn btn-primary btn-user btn-block" tabindex="1" style="display: block;">play</a></li>
+                                                            <li><a href="#" class="cp-pause btn btn-primary btn-user btn-block" tabindex="1" style="display: block;">pause</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 20px;">
+                                            <input class="form-control form-control-user" value="" list="guessListMidi"
+                                                id="guessMidi" type="text" name="guessMidi"
+                                                placeholder="Digite uma música" autocomplete="on">
+                                            <datalist id="guessListMidi"></datalist>
+                                        </div>
+                                        <button id="guessButtonMidi"
+                                            class="btn btn-primary btn-user btn-block">Adivinhar</button>
+                                        <button id="revealButtonMidi"
+                                            class="btn btn-gradient-warning text-white bg-gradient-warning btn-user btn-block">Revelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card o-hidden border-0 shadow-lg my-5">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary text-center">Tentativas</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Nested Row within Card Body -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="p-3">
+                                        <div id="triesMidi" class="bg-gray-300"
+                                            style="padding: 19px;overflow: scroll;max-width: 50p;max-height: 200px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="endGame" style="display: none;">
                     <div class="card o-hidden border-0 shadow-lg my-5">
                         <div class="card-header py-3">
@@ -233,7 +335,6 @@
 
 
     <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
@@ -241,13 +342,6 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
 
 </body>
 
