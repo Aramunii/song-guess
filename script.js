@@ -312,6 +312,7 @@ $(function () {
             var objDiv = document.getElementById("tries");
             objDiv.scrollTop = objDiv.scrollHeight;
         }
+        $('#guess').val('')
     })
 
 
